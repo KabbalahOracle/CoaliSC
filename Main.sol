@@ -13,8 +13,7 @@ contract Main{
     address[] private ballotAddresses;
 
     CoalichainToken private ZuzToken;
-    uint256 private numTransactionToFund = 5;
-    bool public chargeZuz = false;
+    bool public chargeZuz = true;
 
 	uint256 balloutId = 0;
 
@@ -38,8 +37,6 @@ contract Main{
         prices[uint(Types.Service.CREATE_BALLOT)] = 5000000;
 
     }
-
-    function depositGas() public payable {}
 
     function changeOwner(address newOwner) public onlyOwner(msg.sender) {
         require(newOwner != address(0));
@@ -82,16 +79,6 @@ contract Main{
 
     function updateBallotPrice(uint256 newPrice) public onlyOwner(msg.sender) {
         prices[uint(Types.Service.CREATE_BALLOT)] = newPrice;
-    }
-
-
-    function updateNumTransactionToFund(uint256 newNumTransactions) public onlyOwner(msg.sender) {
-        numTransactionToFund = newNumTransactions;
-    }
-
-
-    function updateChargeZuz(bool _chargeZuz) public onlyOwner(msg.sender) {
-        chargeZuz = _chargeZuz;
     }
 
 

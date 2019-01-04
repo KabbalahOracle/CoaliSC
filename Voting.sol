@@ -28,8 +28,6 @@ contract Voting {
   address private coaliWallet;
   uint256 public _balloutDBId = 0;
   
-  address _msgsender;
-
   event Voted(address voterAddress, address candidate, uint256 newVotesReceived, uint256 correlationID);
   event Unvoted(address voterAddress, address candidate, uint256 newVotesReceived, uint256 correlationID);
   event voterApproved(address voterAddress);
@@ -50,40 +48,6 @@ contract Voting {
       voterInfo[_owner].state = Stages.VOTED;
   }
 
-
-  modifier onlyOwner(address MsgSender){
-      require(MsgSender == owner);
-       _;
-  }
-
-  modifier onlyCoalichain() {
-      require(msg.sender == coaliWallet);
-      _;
-  }
-
-  modifier onlyMainContract() {
-      require(msg.sender == mainAddress);
-      _;
-  }
-
-
-  modifier atStage(address voterAddress, Stages _stage) {
-      require(
-          voterInfo[voterAddress].state == _stage
-      );
-      _;
-  }
-
-  modifier transitionNext(address voterAddress)
-  {
-      _;
-      nextStage(voterAddress);
-  }
-
-
-  function nextStage(address voterAddress) internal {
-      voterInfo[voterAddress].state = Stages(uint(voterInfo[voterAddress].state).add(1));
-  }
 
 
   function getCandidatesList() view public returns (address[], uint256[]){
@@ -113,7 +77,6 @@ contract Voting {
 
       require(validCandidate(candidate));
 
-      _msgsender = msg.sender;
       mainContract.payForService(msg.sender, 1000000);
       
 	if(voterInfo[msg.sender].votedFor != candidate) {
@@ -164,17 +127,6 @@ contract Voting {
                 return true;
               }
           }
-
-        return false;
-    }
-
-
-    function isVoterInArray(address[] arr, address voterAddress) pure internal returns (bool){
-        for (uint i = 0; i < arr.length; i++){
-            if (arr[i] == voterAddress){
-                return true;
-            }
-        }
 
         return false;
     }
