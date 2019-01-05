@@ -77,12 +77,14 @@ contract Voting {
 
       require(validCandidate(candidate));
 
-      mainContract.payForService(msg.sender, 1000000);
       
 	if(voterInfo[msg.sender].votedFor != candidate) {
 		   voterInfo[msg.sender].votedFor = candidate;
 		   votesReceived[candidate] = votesReceived[candidate].add(1);
 		   emit Voted(msg.sender, candidate, votesReceived[candidate], correlationID);
+		   
+		   mainContract.payForService(msg.sender, 1000000);
+
 	  }
 
 	  return true;
@@ -94,9 +96,7 @@ contract Voting {
         address oldCandidate = voterInfo[msg.sender].votedFor;
         require(validCandidate(newCandidate));
         require(validCandidate(oldCandidate));
-        if (mainContract.chargeZuz()) {
-            mainContract.payForService(msg.sender, uint256(Types.Service.CHANGE_VOTE));
-        }
+   
 
         votesReceived[oldCandidate] = votesReceived[oldCandidate].sub(1);
         votesReceived[newCandidate] = votesReceived[newCandidate].add(1);
@@ -104,6 +104,10 @@ contract Voting {
         emit Unvoted(msg.sender, oldCandidate, votesReceived[oldCandidate], correlationID);
         emit Voted(msg.sender, newCandidate, votesReceived[newCandidate], correlationID);
 
+		if (mainContract.chargeZuz()) {
+            mainContract.payForService(msg.sender, uint256(Types.Service.CHANGE_VOTE));
+        }
+		
 			return true;
     }
 
@@ -111,13 +115,15 @@ contract Voting {
     function unvoteForCandidate(uint256 correlationID) public returns (bool) {
         require(msg.sender != owner);
         address candidate = voterInfo[msg.sender].votedFor;
-        if (mainContract.chargeZuz()) {
-            mainContract.payForService(msg.sender, uint256(Types.Service.UNVOTE));
-        }
+  
         votesReceived[candidate] = votesReceived[candidate].sub(1);
         voterInfo[msg.sender].state = Stages(uint(voterInfo[msg.sender].state).sub(1));
         emit Unvoted(msg.sender, candidate, votesReceived[candidate], correlationID);
 
+       if (mainContract.chargeZuz()) {
+            mainContract.payForService(msg.sender, uint256(Types.Service.UNVOTE));
+        }
+		
 		return true;
     }
 

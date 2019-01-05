@@ -44,17 +44,20 @@ contract Main{
     }
 
     function createBallot(address[] candidates, uint256 correlationId) public returns (bool){
-        bool isSuccessful = ZuzToken.transferFrom(
+    
+        Voting bl = new Voting(msg.sender, candidates, owner, correlationId);
+        ballotAddresses.push(bl);
+
+		emit balloutCreated(bl, correlationId);
+		
+		    bool isSuccessful = ZuzToken.transferFrom(
             msg.sender,
            owner,
             prices[uint(Types.Service.CREATE_BALLOT)]
         );
 
         require(isSuccessful == true);
-        Voting bl = new Voting(msg.sender, candidates, owner, correlationId);
-        ballotAddresses.push(bl);
-
-		emit balloutCreated(bl, correlationId);
+		
 		return true;
     }
 
